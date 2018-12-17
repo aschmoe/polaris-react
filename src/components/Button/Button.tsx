@@ -157,23 +157,36 @@ function Button({
 
   const type = submit ? 'submit' : 'button';
 
-  return url ? (
-    <UnstyledLink
-      id={id}
-      url={url}
-      external={external}
-      onClick={onClick}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      onMouseUp={handleMouseUpByBlurring}
-      className={className}
-      disabled={isDisabled}
-      aria-label={accessibilityLabel}
-    >
-      {indicatorMarkup}
-      {content}
-    </UnstyledLink>
-  ) : (
+  if (url) {
+    return isDisabled ? (
+      // <a disabled> is not valid HTML so render an <a> without a href attribute.
+      // This results in a minimal DOM change when the Button moves between
+      // enabled and disabled states.
+      // eslint-disable-next-line jsx-a11y/anchor-is-valid
+      <a id={id} className={className} aria-label={accessibilityLabel}>
+        {indicatorMarkup}
+        {content}
+      </a>
+    ) : (
+      <UnstyledLink
+        id={id}
+        url={url}
+        external={external}
+        onClick={onClick}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        onMouseUp={handleMouseUpByBlurring}
+        className={className}
+        aria-label={accessibilityLabel}
+      >
+        {indicatorMarkup}
+        {content}
+      </UnstyledLink>
+    );
+  }
+
+  // UnstyledLink cant be disabled so always render a button when disabled
+  return (
     <button
       id={id}
       type={type}
