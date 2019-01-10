@@ -29,7 +29,7 @@ Range sliders should:
 - When a label is visible, it should clearly communicate the purpose of the range input and its values (min, max, step, value)
 - Be labeled as “Optional” when you need to request input that’s not required
 - Validate input as soon as merchants have finished interacting with a field (but not before)
-- Always be used with `accessibilityInputs` when range slider has dual thumbs, to provide accessible alternatives to sliding the thumbs
+- Always be used with two text field components when range slider has dual thumbs, to provide accessible alternatives to both the lower and upper thumbs
 
 ---
 
@@ -232,20 +232,110 @@ Use a dual thumb range slider when merchants need to select a range of values.
 
 ```jsx
 class RangeSliderExample extends React.Component {
-  handleChange = (value) => {
-    console.log({value});
+  state = {
+    rangeSliderValues: [100, 500],
+    lowerTextFieldValue: '100',
+    upperTextFieldValue: '500',
+  };
+
+  handleRangeSliderChange = (value: [number, number]) => {
+    this.setState({
+      rangeSliderValues: value,
+      lowerTextFieldValue: `${value[0]}`,
+      upperTextFieldValue: `${value[1]}`,
+    });
+  };
+
+  handleLowerTextFieldChange = (lowerValue: string) => {
+    const {rangeSliderValues} = this.state;
+    const upperValue = rangeSliderValues[1];
+    this.setState({lowerTextFieldValue: lowerValue});
+
+    setTimeout(() => {
+      this.setState({
+        rangeSliderValues: [parseInt(lowerValue, 10), upperValue],
+      });
+    }, 500);
+  };
+
+  handleUpperTextFieldChange = (upperValue: string) => {
+    const {rangeSliderValues} = this.state;
+    const lowerValue = rangeSliderValues[0];
+    this.setState({upperTextFieldValue: upperValue});
+
+    setTimeout(() => {
+      this.setState({
+        rangeSliderValues: [lowerValue, parseInt(upperValue, 10)],
+      });
+    }, 500);
   };
 
   render() {
+    const {
+      rangeSliderValues,
+      lowerTextFieldValue,
+      upperTextFieldValue,
+    } = this.state;
+
+    const prefix = '$';
+    const min = 0;
+    const max = 5000;
+    const step = 10;
+    const disabled = false;
+
+    const wrapperStyles = {
+      marginTop: '8px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      flexWrap: 'wrap',
+    };
+
+    const styles = {
+      flexGrow: '1',
+      marginTop: '8px',
+      maxWidth: '150px',
+    };
+
     return (
       <Card sectioned>
-        <RangeSlider
-          label=""
-          value={[35, 60]}
-          onChange={this.handleChange}
-          accessibilityInputs
-          step={5}
-        />
+        <div style={{marginTop: '20px'}}>
+          <RangeSlider
+            label="Money spent is between"
+            value={rangeSliderValues}
+            onChange={this.handleRangeSliderChange}
+            min={min}
+            max={max}
+            step={step}
+            output
+            disabled={disabled}
+          />
+          <div style={wrapperStyles}>
+            <div style={styles}>
+              <TextField
+                label="Min money spent"
+                type="number"
+                value={lowerTextFieldValue}
+                prefix={prefix}
+                min={min}
+                max={max}
+                step={step}
+                onChange={this.handleLowerTextFieldChange}
+              />
+            </div>
+            <div style={styles}>
+              <TextField
+                label="Max money spent"
+                type="number"
+                value={upperTextFieldValue}
+                prefix={prefix}
+                min={min}
+                max={max}
+                step={step}
+                onChange={this.handleUpperTextFieldChange}
+              />
+            </div>
+          </div>
+        </div>
       </Card>
     );
   }
