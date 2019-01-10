@@ -418,16 +418,17 @@ function formatDateForTimezone(date: Date) {
     return date.toISOString();
   }
 
-  const midnight =
-    hourOffset > -1
-      ? date.getHours() + hourOffset
-      : date.getHours() - hourOffset;
+  if (date.getHours() === 0) {
+    date.setHours(0, 0, 0);
+  } else if (hourOffset > 0) {
+    date.setHours(date.getHours() + hourOffset, 0, 0);
+  } else {
+    date.setHours(date.getHours() - Math.abs(hourOffset), 0, 0);
+  }
 
-  const updatedDate = new Date(date.setHours(midnight));
-  const month = `0${String(updatedDate.getUTCMonth() + 1)}`.slice(-2);
-  const day = `0${String(updatedDate.getUTCDate())}`.slice(-2);
-
-  const formattedDate = `${updatedDate.getUTCFullYear()}-${month}-${day}T00:00:00.000Z`;
+  const month = `0${String(date.getMonth() + 1)}`.slice(-2);
+  const day = `0${String(date.getDate())}`.slice(-2);
+  const formattedDate = `${date.getFullYear()}-${month}-${day}T00:00:00.000Z`;
   return formattedDate;
 }
 

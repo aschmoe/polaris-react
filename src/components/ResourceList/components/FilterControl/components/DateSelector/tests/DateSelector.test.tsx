@@ -161,7 +161,7 @@ describe('<DateSelector />', () => {
     });
   });
 
-  describe('timezones adjustments', () => {
+  describe.only('timezones adjustments', () => {
     const timeZoneOffsets = [720, 540, 60, 0, -60, -540, -720];
     const dates = ['2017-12-01', '2019-01-01', '2019-08-22'];
 
@@ -169,7 +169,7 @@ describe('<DateSelector />', () => {
 
     dates.forEach((date) => {
       timeZoneOffsets.forEach((zone) => {
-        it(`sets the correct date for timezone offset ${zone}`, () => {
+        it(`sets the correct values for ${date} with timezone offset ${zone}`, () => {
           Date.prototype.getTimezoneOffset = () => zone; // eslint-disable-line no-extend-native
 
           const wrapper = mountWithAppProvider(
